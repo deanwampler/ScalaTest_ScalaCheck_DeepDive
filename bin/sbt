@@ -1,0 +1,5 @@
+#!/bin/sh
+#------------
+# Driver script for SBT
+
+java -Xmx512M -jar lib/sbt-launcher-0.5.6.jar "$@"
