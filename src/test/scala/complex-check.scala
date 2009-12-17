@@ -27,10 +27,9 @@ object ComplexSpecification extends Properties("Complex") {
 
   val zero = Complex(0.0, 0.0)
   
-  specify("addition with (0,0)", (a: Complex)  => additionTest(a, zero))
-  specify("subtraction with (0,0)", (a: Complex)  => subtractionTest(a, zero))
+  property("addition with (0,0)")    = Prop.forAll((a: Complex) => additionTest(a, zero))
+  property("subtraction with (0,0)") = Prop.forAll((a: Complex) => subtractionTest(a, zero))
 
-  specify("addition", (a: Complex, b: Complex) => additionTest(a,b))
-  specify("subtraction", (a: Complex, b: Complex) => subtractionTest(a,b))
+  property("addition")    = Prop.forAll((a: Complex, b: Complex) => additionTest(a, b))
+  property("subtraction") = Prop.forAll((a: Complex, b: Complex) => subtractionTest(a, b))
 }
-//ComplexSpecification.check

@@ -1,88 +1,82 @@
-<h1 id="scalatest_and_scalacheck_deep_dive">ScalaTest and ScalaCheck Deep Dive</h1>
+# ScalaTest and ScalaCheck Deep Dive #
 
-<p>Chicago-Area Scala Enthusiasts
-December 17, 2009</p>
+Chicago-Area Scala Enthusiasts
+December 17, 2009
 
-<h2 id="introduction">Introduction</h2>
+## Introduction ##
 
-<p>This meeting is a deeper dive into <a href="http://www.scalatest.org/">ScalaTest</a>, covering the major &#8220;style&#8221; options available. Then we&#8217;ll talk about <a href="http://code.google.com/p/scalacheck/">ScalaCheck</a>, a port of Haskell&#8217;s <a href="http://www.cs.chalmers.se/~rjmh/QuickCheck/">QuickCheck</a>, which approaches testing from a functional perspective.</p>
+This meeting is a deeper dive into [ScalaTest](http://www.scalatest.org/), covering the major "style" options available. Then we'll talk about [ScalaCheck](http://code.google.com/p/scalacheck/), a port of Haskell's [QuickCheck](http://www.cs.chalmers.se/~rjmh/QuickCheck/), which approaches testing from a functional perspective.
 
-<p>In <code>ScalaCheck</code>, you specify the properties for a type and verify that those properties are satisfied using an automatically-generated and representative sample of instances of the type. It&#8217;s a very different style than XUnit or BDD style testing that you might already know.</p>
+In `ScalaCheck`, you specify the properties for a type and verify that those properties are satisfied using an automatically-generated and representative sample of instances of the type. It's a very different style than XUnit or BDD style testing that you might already know.
 
-<p>We&#8217;ll work through examples of all these approaches using a simple Complex number class. Then you can play with the test styles using a provided Rational number class. (There isn&#8217;t a presentation to go with this code&#8230;)</p>
+We'll work through examples of all these approaches using a simple Complex number class. Then you can play with the test styles using a provided Rational number class. (There isn't a presentation to go with this code...)
 
-<h2 id="getting_the_code">Getting the Code</h2>
+## Getting the Code ##
 
-<pre><code>git clone git://github.com/deanwampler/ScalaTest_ScalaCheck_DeepDive.git
-</code></pre>
+    git clone git://github.com/deanwampler/ScalaTest_ScalaCheck_DeepDive.git
 
-<p>Project <a href="http://github.com/deanwampler/ScalaTest_ScalaCheck_DeepDive">Web site</a>.</p>
+Here is the GitHub [project web site](http://github.com/deanwampler/ScalaTest_ScalaCheck_DeepDive).
 
-<h2 id="building_and_testing">Building and Testing</h2>
+## Building and Testing ##
 
-<p>The code uses <a href="http://code.google.com/p/simple-build-tool/">sbt</a>, the <em>Simple Build Tool</em>. The jar for it is in the <code>lib</code> directory and two driver scripts are provided in the <code>bin</code> directory.</p>
+The code uses [sbt](http://code.google.com/p/simple-build-tool/), the *Simple Build Tool*. The jar for it is in the `lib` directory and two driver scripts are provided in the `bin` directory.
 
-<pre><code>bin/sbt       # Mac OS, Linux, or Unix (maybe Cygwin?)
-bin\sbt.bat   # Windows
-</code></pre>
+    bin/sbt       # Mac OS, Linux, or Unix (maybe Cygwin?)
+    bin\sbt.bat   # Windows
 
-<p>I assume you have Scala 2.7.7 installed. If you are using a different version of
-Scala, edit the <code>project/build.properties</code> file and change the value for the <code>scala.version</code> property to match your version. </p>
+The code works with Scala 2.7.7 (which the SBT build will install). The code may work with earlier versions of Scala and possibly with Scala 2.8.0. You can experiment with different versions by changing the value for the `scala.version` property in `project/build.properties`. See also the additional dependencies that are defined in `project/build/ScalaTestingDeepDive.scala`.
 
-<p>If you are using 2.8, please check the SBT website to find out if you need a different <code>sbt-launcher-X.Y.Z.jar</code> version. If so, replace the one in the <code>lib</code> directory.</p>
+Also, if you want to are 2.8, please check the SBT website to find out if you need a different `sbt-launcher-X.Y.Z.jar` version. If so, replace the one in the `lib` directory.
 
-<h3 id="startin_sbt">Startin SBT</h3>
+### Starting SBT ###
 
-<p>To begin, run either <code>bin/sbt</code> or <code>bin\sbt.bat</code>.</p>
+To begin, run either `bin/sbt` or `bin\sbt.bat`.
 
-<p>At the prompt Run the following two commands.</p>
+At the prompt Run the following commands.
 
-<pre><code>&gt; help
-&gt; update
-&gt; test
-</code></pre>
+    > help
+    > update
+    > test
 
-<p>The <code>help</code> <em>action</em>, isn&#8217;t really required, but now you know what to do when you have questions&#8230;</p>
+The `help` *action* isn't really required, but now you know what to do when you have questions&#8230;
 
-<p>The <code>update</code> action pulls down the other dependencies (required). </p>
+The `update` action pulls down the other dependencies (required). 
 
-<p>The <code>test</code> action will first compile all the files, then run the tests. The (lengthy) output should end with the following:</p>
+The `test` action will first compile all the files, then run the tests. The (lengthy) output should end with the following:
 
-<pre><code>[info] ...
-[info] == test-finish ==
-[info] Run: 24, Passed: 24, Errors: 0, Failed: 0
-[info]  
-[info] All tests PASSED.
-[info] == test-finish ==
-[info] 
-[info] == test-cleanup ==
-[info] == test-cleanup ==
-[info] 
-[info] == test ==
-[info] == test ==
-[success] Successful.
-[info] 
-[info] Total time: 6 s
-&gt;
-</code></pre>
+    [info] ...
+    [info] == test-finish ==
+    [info] Run: 24, Passed: 24, Errors: 0, Failed: 0
+    [info]  
+    [info] All tests PASSED.
+    [info] == test-finish ==
+    [info] 
+    [info] == test-cleanup ==
+    [info] == test-cleanup ==
+    [info] 
+    [info] == test ==
+    [info] == test ==
+    [success] Successful.
+    [info] 
+    [info] Total time: 6 s
+    >
 
-<p>SBT has the cool feature that you can define an action to run after every change to the file system. This saves you the trouble of manually invoking a target, like <code>test</code> each time.</p>
+SBT has the cool feature that you can define an action to run after every change to the file system. This saves you the trouble of manually invoking a target, like `test` each time.
 
-<pre><code>&gt; ~ test
-</code></pre>
+    > ~ test
 
-<p>I recommend you do this for the rest of the session. (You can hit <code>&lt;return&gt;</code> to break out of it at any time.)</p>
+I recommend you do this for the rest of the session. (You can hit `<return>` to break out of it at any time.)
 
-<h2 id="learning_about_scalatest_and_scalacheck">Learning about ScalaTest and ScalaCheck</h2>
+## Learning about ScalaTest and ScalaCheck ##
 
-<p>We&#8217;ll walk through all the examples using different syntax options for ScalaTest and the different approach of ScalaCheck, both using a simple Complex number class. Feel free to use any editor to view the files. </p>
+We'll walk through all the examples using different syntax options for ScalaTest and the different approach of ScalaCheck, both using a simple Complex number class. Feel free to use any editor to view the files. 
 
-<p>The file <code>complex.scala</code> is in <code>src/main/scala</code>. (You&#8217;ll also find <code>rational.scala</code>, which we&#8217;ll discuss shortly.)</p>
+The file `complex.scala` is in `src/main/scala`. (You'll also find `rational.scala`, which we'll discuss shortly.)
 
-<p>The corresponding ScalaTest files are <code>src/test/scala/complex-*-test.scala</code>. The ScalaCheck file is <code>src/test/scala/complex-check.scala</code>. </p>
+The corresponding ScalaTest files are `src/test/scala/complex-*-test.scala`. The ScalaCheck file is `src/test/scala/complex-check.scala`. 
 
-<h2 id="your_exercise_should_you_choose_to_accept_it">Your Exercise, Should You Choose to Accept It</h2>
+## Your Exercise, Should You Choose to Accept It ##
 
-<p>The <code>rational.scala</code> file defines a <code>Rational</code> class with a little more detail than the <code>Complex</code> class. Pick one or more of the ScalaTest styles and create tests that exercise the Rational class. Do the same thing for ScalaCheck testing.</p>
+The `rational.scala` file defines a `Rational` class with a little more detail than the `Complex` class. Pick one or more of the ScalaTest styles and create tests that exercise the Rational class. Do the same thing for ScalaCheck testing.
 
-<p>See the <a href="http://www.scalatest.org/">ScalaTest</a> and <a href="http://code.google.com/p/scalacheck/">ScalaCheck</a> documentation for more detailed examples, &#8220;scaladocs&#8221;, etc. </p>
+See the [ScalaTest](http://www.scalatest.org/) and [ScalaCheck](http://code.google.com/p/scalacheck/) documentation for more detailed examples, "scaladocs", etc. 
