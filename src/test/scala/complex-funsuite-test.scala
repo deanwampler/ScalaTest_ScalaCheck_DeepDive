@@ -2,7 +2,7 @@
 
 import org.scalatest.FunSuite
 
-// "Functional" tests; very minimalist syntax.
+// "Functional" tests; very minimalist, XUnit-style syntax.
 
 class ComplexFunSuite extends FunSuite {
 

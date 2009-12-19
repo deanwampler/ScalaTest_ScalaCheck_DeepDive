@@ -13,7 +13,8 @@ import org.scalatest.matchers.ShouldMatchers
 //   http://www.scalatest.org/getting_started_with_feature_spec
 // Cucumber and FitNesse are other tools that promote feature/acceptance testing.
  
-class ComplexBDDFeatureSpecSuite extends FeatureSpec with GivenWhenThen with ShouldMatchers {
+class ComplexBDDFeatureSpecSuite extends FeatureSpec 
+  with GivenWhenThen with ShouldMatchers {
 
   val c0 = Complex(0.0, 0.0)
   val c1 = Complex(1.2, 3.4)
@@ -27,7 +28,7 @@ class ComplexBDDFeatureSpecSuite extends FeatureSpec with GivenWhenThen with Sho
       given("An arbitrary Complex number")
       when("I add Complex(0,0) to it")
       then("I should get a new number with same value as the original number")
-      // pending  // When you haven't implemented the scenario yet.
+      // pending  // Use when you haven't implemented the scenario yet.
       (c1 + c0) should equal (c1)      
     }
 

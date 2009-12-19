@@ -23,7 +23,7 @@ class ComplexBDDFlatSpecSuite extends FlatSpec with ShouldMatchers {
     (c1 - c0) should equal (c1)
   }
 
-  // Helpful hint: DON'T forget the "in" before the opening "{"!
+  // Pro tip: DON'T forget the "in" before the opening "{"!
   it should "Add two Complex numbers together and return a new number" in {
     (c1 + c2).real      should equal (c1.real      + c2.real);
     (c1 + c2).imaginary should equal (c1.imaginary + c2.imaginary)

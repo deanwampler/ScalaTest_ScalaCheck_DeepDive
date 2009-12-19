@@ -17,19 +17,25 @@ object ComplexSpecification extends Properties("Complex") {
     }
   }
 
-  def additionTest(a: Complex, b: Complex) = 
+  val zero = Complex(0.0, 0.0)
+
+  // Call out the special case of + and - with (0,0), effectively the
+  // identity operation.
+  property("addition with (0,0)")    = Prop.forAll { (a: Complex) => 
+    (a + zero).real.equals(a.real) &&
+    (a + zero).imaginary.equals(a.imaginary)
+  }
+  property("subtraction with (0,0)") = Prop.forAll { (a: Complex) =>
+    (a - zero).real.equals(a.real) &&
+    (a - zero).imaginary.equals(a.imaginary)
+  }
+
+  property("addition")    = Prop.forAll { (a: Complex, b: Complex) => 
     (a + b).real.equals(a.real + b.real) &&
     (a + b).imaginary.equals(a.imaginary + b.imaginary)
-
-  def subtractionTest(a: Complex, b: Complex) = 
+  }
+  property("subtraction") = Prop.forAll { (a: Complex, b: Complex) => 
     (a - b).real.equals(a.real - b.real) &&
     (a - b).imaginary.equals(a.imaginary - b.imaginary)
-
-  val zero = Complex(0.0, 0.0)
-  
-  property("addition with (0,0)")    = Prop.forAll((a: Complex) => additionTest(a, zero))
-  property("subtraction with (0,0)") = Prop.forAll((a: Complex) => subtractionTest(a, zero))
-
-  property("addition")    = Prop.forAll((a: Complex, b: Complex) => additionTest(a, b))
-  property("subtraction") = Prop.forAll((a: Complex, b: Complex) => subtractionTest(a, b))
+  }
 }
